@@ -23,6 +23,8 @@ import { Input } from "@/components/ui/input";
 import { Teacher } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { Avatar } from "@/components/ui/avatar";
 
 const paymentSchema = z.object({
   amount: z.coerce
@@ -47,6 +49,8 @@ export const PaymentModal = ({
   teacher
 }: PaymentModalProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'bank' | 'upi'>('bank');
+  const [upiId, setUpiId] = useState('');
 
   const form = useForm({
     resolver: zodResolver(paymentSchema),
@@ -78,69 +82,132 @@ export const PaymentModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Make a Payment to {teacher?.name}</DialogTitle>
-          <DialogDescription>
-            Confirm the amount and add a note for this payment.
-          </DialogDescription>
-        </DialogHeader>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-4 py-4">
-            <FormField
-              control={form.control}
-              name="amount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Amount ($)</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      {...field}
-                      value={field.value as number | undefined}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+      <DialogContent className="max-w-md p-0 bg-gradient-to-br from-background to-muted shadow-2xl rounded-2xl">
+        <Card className="bg-transparent shadow-none border-none">
+          <CardHeader className="flex flex-col items-center gap-2 pb-0">
+            <div className="relative flex flex-col items-center w-full">
+              {teacher?.avatarUrl && (
+                <Avatar className="w-20 h-20 mb-2">
+                  <img src={teacher.avatarUrl} alt={teacher.name} className="w-20 h-20 rounded-full object-cover border-4 border-primary shadow-lg bg-background" />
+                </Avatar>
               )}
-            />
-            <FormField
-              control={form.control}
-              name="note"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Note (Optional)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., May Salary" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+              <CardTitle className="text-xl font-bold mt-2">Payment to {teacher?.name}</CardTitle>
+              <div className="text-muted-foreground text-sm">{teacher?.email}</div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="flex flex-col gap-4 mb-4">
+              <div className="flex gap-4 items-center">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="bank"
+                    checked={paymentMethod === 'bank'}
+                    onChange={() => setPaymentMethod('bank')}
+                    className="accent-primary"
+                  />
+                  <span className="font-medium">Bank Transfer</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="upi"
+                    checked={paymentMethod === 'upi'}
+                    onChange={() => setPaymentMethod('upi')}
+                    className="accent-primary"
+                  />
+                  <span className="font-medium">UPI</span>
+                </label>
+              </div>
+              {paymentMethod === 'upi' && (
+                <div className="flex flex-col gap-2 bg-muted/60 rounded-lg p-4 border">
+                  <label htmlFor="upiId" className="font-medium mb-1">UPI ID</label>
+                  <input
+                    id="upiId"
+                    type="text"
+                    placeholder="example@upi"
+                    value={upiId}
+                    onChange={e => setUpiId(e.target.value)}
+                    className="bg-background/80 border rounded px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                  <div className="flex items-center gap-2 mt-2">
+                    <div className="w-16 h-16 bg-border rounded-lg flex items-center justify-center text-xs text-muted-foreground">
+                      QR
+                    </div>
+                    <span className="text-xs text-muted-foreground">Scan to pay via UPI</span>
+                  </div>
+                </div>
               )}
-            />
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-                disabled={isSubmitting}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Processing...
-                  </>
-                ) : (
-                  "Confirm Payment"
-                )}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+            </div>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="flex flex-col gap-6 mt-4"
+              >
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="amount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="mb-1">Amount ($)</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            {...field}
+                            value={field.value as number | undefined}
+                            className="bg-background/80 text-lg mt-1"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="note"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="mb-1">Note (Optional)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g., May Salary" {...field} className="bg-background/80 mt-1" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="h-px bg-border my-2" />
+                <div className="flex justify-end gap-4 mt-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={onClose}
+                    disabled={isSubmitting}
+                    className="px-6 py-2 rounded-lg text-base"
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={isSubmitting} className="px-6 py-2 rounded-lg text-base font-semibold shadow-md">
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      paymentMethod === 'upi' ? 'Pay via UPI' : 'Confirm Payment'
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
       </DialogContent>
     </Dialog>
   );

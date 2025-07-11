@@ -18,11 +18,12 @@ import {
 import { MoreHorizontal, DollarSign, Edit, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-interface TeacherTableProps {
+export interface TeacherTableProps {
   teachers: Teacher[];
   onPay: (teacher: Teacher) => void;
-  onEdit: (updatedTeacher: Teacher) => void;
-  onDelete: (teacherToDelete: Teacher) => void;
+  onEdit: (teacher: Teacher) => void;
+  onDelete: (teacher: Teacher) => void;
+  onViewDetails?: (teacher: Teacher) => void;
 }
 
 const statusVariantMap: Record<
@@ -38,7 +39,8 @@ export const TeacherTable = ({
   teachers,
   onPay,
   onEdit,
-  onDelete
+  onDelete,
+  onViewDetails
 }: TeacherTableProps) => {
   return (
     <div className="rounded-md border">
@@ -54,7 +56,14 @@ export const TeacherTable = ({
         </TableHeader>
         <TableBody>
           {teachers.map((teacher) => (
-            <TableRow key={teacher.id}>
+            <TableRow
+              key={teacher.id}
+              className={onViewDetails ? "cursor-pointer hover:bg-gray-100 transition" : undefined}
+              onClick={onViewDetails ? () => onViewDetails(teacher) : undefined}
+              role={onViewDetails ? "button" : undefined}
+              tabIndex={onViewDetails ? 0 : undefined}
+              onKeyPress={onViewDetails ? (e) => { if (e.key === 'Enter') onViewDetails(teacher); } : undefined}
+            >
               <TableCell className="font-medium">
                 <div className="flex items-center gap-3">
                   <Avatar>

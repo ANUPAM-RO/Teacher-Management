@@ -9,4 +9,8 @@ export interface Teacher {
   paymentStatus: PaymentStatus;
   lastPaymentDate: string; // ISO 8601 date string
   salary: number;
+  phone?: string;
+  dob?: string;
+  gender?: string;
+  address?: string;
 }

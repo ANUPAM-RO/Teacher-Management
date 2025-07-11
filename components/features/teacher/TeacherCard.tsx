@@ -13,11 +13,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreVertical, DollarSign, Edit, Trash2 } from "lucide-react";
 
-interface TeacherCardProps {
+export interface TeacherCardProps {
   teacher: Teacher;
   onPay: (teacher: Teacher) => void;
   onEdit: (teacher: Teacher) => void;
   onDelete: (teacher: Teacher) => void;
+  onViewDetails?: () => void;
 }
 
 const statusVariantMap: Record<
@@ -33,7 +34,8 @@ export const TeacherCard = ({
   teacher,
   onPay,
   onEdit,
-  onDelete
+  onDelete,
+  onViewDetails
 }: TeacherCardProps) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -47,7 +49,13 @@ export const TeacherCard = ({
   };
 
   return (
-    <>
+    <div
+      className="rounded-lg border bg-card text-card-foreground shadow-sm p-4 cursor-pointer hover:shadow-md transition-shadow"
+      onClick={onViewDetails}
+      role="button"
+      tabIndex={0}
+      onKeyPress={(e) => { if (e.key === 'Enter' && onViewDetails) onViewDetails(); }}
+    >
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-lg font-medium">{teacher.name}</CardTitle>
@@ -106,6 +114,6 @@ export const TeacherCard = ({
         title={`Delete ${teacher.name}?`}
         description="Are you sure you want to delete this teacher? This action cannot be undone."
       />
-    </>
+    </div>
   );
 };

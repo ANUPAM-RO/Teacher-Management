@@ -11,6 +11,7 @@ import { EditTeacherModal } from "@/components/features/teacher/EditTeacherModal
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { ModeToggle } from "@/components/ModeToggle";
+import { useRouter } from "next/navigation";
 
 export default function TeacherManagementPage() {
   // In a real app, this would come from an API call (e.g., useSWR or React Query)
@@ -19,6 +20,8 @@ export default function TeacherManagementPage() {
   const [isAddTeacherModalOpen, setIsAddTeacherModalOpen] = useState(false);
   const [isEditTeacherModalOpen, setIsEditTeacherModalOpen] = useState(false);
   const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null);
+
+  const router = useRouter();
 
   const handleOpenPaymentModal = (teacher: Teacher) => {
     setSelectedTeacher(teacher);
@@ -53,7 +56,7 @@ export default function TeacherManagementPage() {
 
   const handleEditTeacher = (teacher: Teacher) => {
     setSelectedTeacher(teacher);
-    setIsEditTeacherModalOpen(true);
+    router.push(`/teachers/${teacher.id}`);
   };
 
   const handleSaveTeacher = (updatedTeacher: Teacher) => {
@@ -67,6 +70,10 @@ export default function TeacherManagementPage() {
     setTeachers((prevTeachers) =>
       prevTeachers.filter((t) => t.id !== teacherToDelete.id)
     );
+  };
+
+  const handleViewDetails = (teacher: Teacher) => {
+     router.push(`/teachers/${teacher.id}`);
   };
 
   return (
@@ -100,6 +107,7 @@ export default function TeacherManagementPage() {
                 onPay={handleOpenPaymentModal}
                 onEdit={handleEditTeacher}
                 onDelete={handleDeleteTeacher}
+                onViewDetails={() => handleViewDetails(teacher)}
               />
             ))}
           </div>
@@ -110,6 +118,7 @@ export default function TeacherManagementPage() {
             onPay={handleOpenPaymentModal}
             onEdit={handleEditTeacher}
             onDelete={handleDeleteTeacher}
+            onViewDetails={handleViewDetails}
           />
         </div>
       </main>
