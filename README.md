@@ -82,7 +82,7 @@ npm run dev
 ```
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser
-5. 4. Open [https://teacher-management-roy.netlify.app] for live demo
+5. Open https://teacher-management-roy.netlify.app for live demo
 
 ## 📁 Project Structure
 
