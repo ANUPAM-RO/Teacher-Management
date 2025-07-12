@@ -23,13 +23,7 @@ export default function TeacherDetailsPage() {
     [id, teachers]
   );
 
-  // Mock address, personal info, and availability
-  const address = "123 Main St, Springfield";
-  const personalInfo = {
-    phone: "+1 555-123-4567",
-    dob: "1985-06-15",
-    gender: "Male",
-  };
+
   const availability = [
     { day: "Monday", time: "9:00 AM - 3:00 PM" },
     { day: "Wednesday", time: "9:00 AM - 3:00 PM" },
