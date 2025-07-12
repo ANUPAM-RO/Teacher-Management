@@ -15,8 +15,6 @@ import {
   FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Teacher } from "@/lib/types";
-import { mockTeachers } from "@/lib/mockData";
 import { 
   Loader2, 
   CreditCard, 

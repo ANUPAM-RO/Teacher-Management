@@ -63,7 +63,7 @@ A modern, full-featured Next.js application for comprehensive teacher management
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/Rex-Arnab/teacher-management.git
+git clone https://github.com/ANUPAM-RO/Teacher-Management.git
 cd teacher-management-app
 ```
 
