@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Teacher } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ import {
 import { MoreHorizontal, DollarSign, Edit, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
+import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
 
 export interface TeacherTableProps {
   teachers: Teacher[];
@@ -43,6 +45,27 @@ export const TeacherTable = ({
   onDelete,
   onViewDetails
 }: TeacherTableProps) => {
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [teacherToDelete, setTeacherToDelete] = useState<Teacher | null>(null);
+
+  const handleDeleteClick = (teacher: Teacher) => {
+    setTeacherToDelete(teacher);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (teacherToDelete) {
+      onDelete(teacherToDelete);
+      setIsDeleteDialogOpen(false);
+      setTeacherToDelete(null);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setIsDeleteDialogOpen(false);
+    setTeacherToDelete(null);
+  };
+
   return (
     <div className="rounded-md border">
       <Table>
@@ -115,7 +138,7 @@ export const TeacherTable = ({
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       className="text-red-500"
-                      onClick={(e) => { e.stopPropagation(); onDelete(teacher); }}>
+                      onClick={(e) => { e.stopPropagation(); handleDeleteClick(teacher); }}>
                       <Trash2 className="mr-2 h-4 w-4" />
                       Delete
                     </DropdownMenuItem>
@@ -126,6 +149,13 @@ export const TeacherTable = ({
           ))}
         </TableBody>
       </Table>
+      <DeleteConfirmationDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title={teacherToDelete ? `Delete ${teacherToDelete.name}?` : "Delete Teacher?"}
+        description="Are you sure you want to delete this teacher? This action cannot be undone."
+      />
     </div>
   );
 };
