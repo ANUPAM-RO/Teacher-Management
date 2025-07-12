@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/table";
 import { MoreHorizontal, DollarSign, Edit, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Link from "next/link";
 
 export interface TeacherTableProps {
   teachers: Teacher[];
@@ -90,23 +91,31 @@ export const TeacherTable = ({
               <TableCell className="text-right">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
+                    <Button 
+                      variant="ghost" 
+                      className="h-8 w-8 p-0"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <span className="sr-only">Open menu</span>
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => onPay(teacher)}>
-                      <DollarSign className="mr-2 h-4 w-4" />
-                      Make Payment
+                    <DropdownMenuItem asChild>
+                      <Link href={`/teachers/${teacher.id}/payment`} onClick={(e) => e.stopPropagation()}>
+                        <DollarSign className="mr-2 h-4 w-4" />
+                        Make Payment
+                      </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onEdit(teacher)}>
-                      <Edit className="mr-2 h-4 w-4" />
-                      Edit details
+                    <DropdownMenuItem asChild>
+                      <Link href={`/teachers/${teacher.id}/edit`} onClick={(e) => e.stopPropagation()}>
+                        <Edit className="mr-2 h-4 w-4" />
+                        Edit details
+                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       className="text-red-500"
-                      onClick={() => onDelete(teacher)}>
+                      onClick={(e) => { e.stopPropagation(); onDelete(teacher); }}>
                       <Trash2 className="mr-2 h-4 w-4" />
                       Delete
                     </DropdownMenuItem>

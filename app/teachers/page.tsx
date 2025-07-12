@@ -1,75 +1,24 @@
 "use client"; // Required for hooks and event handlers
 
-import { useState } from "react";
-import { mockTeachers } from "@/lib/mockData";
 import { Teacher } from "@/lib/types";
 import { TeacherCard } from "@/components/features/teacher/TeacherCard";
 import { TeacherTable } from "@/components/features/teacher/TeacherTable";
-import { PaymentModal } from "@/components/features/teacher/PaymentModal";
-import { AddTeacherModal } from "@/components/features/teacher/AddTeacherModal";
-import { EditTeacherModal } from "@/components/features/teacher/EditTeacherModal";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { ModeToggle } from "@/components/ModeToggle";
 import { useRouter } from "next/navigation";
+import { useTeachers } from "@/lib/contexts/TeacherContext";
 
 export default function TeacherManagementPage() {
-  // In a real app, this would come from an API call (e.g., useSWR or React Query)
-  const [teachers, setTeachers] = useState<Teacher[]>(mockTeachers);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isAddTeacherModalOpen, setIsAddTeacherModalOpen] = useState(false);
-  const [isEditTeacherModalOpen, setIsEditTeacherModalOpen] = useState(false);
-  const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null);
-
+  const { teachers, deleteTeacher } = useTeachers();
   const router = useRouter();
 
-  const handleOpenPaymentModal = (teacher: Teacher) => {
-    setSelectedTeacher(teacher);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedTeacher(null);
-  };
-
-  const handlePaymentSuccess = () => {
-    if (selectedTeacher) {
-      // Update the teacher's status in the local state
-      setTeachers((prevTeachers) =>
-        prevTeachers.map((t) =>
-          t.id === selectedTeacher.id
-            ? {
-                ...t,
-                paymentStatus: "Paid",
-                lastPaymentDate: new Date().toISOString()
-              }
-            : t
-        )
-      );
-    }
-  };
-
-  const handleAddTeacher = (newTeacher: Teacher) => {
-    setTeachers((prev) => [...prev, newTeacher]);
-  };
-
   const handleEditTeacher = (teacher: Teacher) => {
-    setSelectedTeacher(teacher);
-    router.push(`/teachers/${teacher.id}`);
-  };
-
-  const handleSaveTeacher = (updatedTeacher: Teacher) => {
-    setTeachers((prevTeachers) =>
-      prevTeachers.map((t) => (t.id === updatedTeacher.id ? updatedTeacher : t))
-    );
-    setIsEditTeacherModalOpen(false);
+    router.push(`/teachers/${teacher.id}/edit`);
   };
 
   const handleDeleteTeacher = (teacherToDelete: Teacher) => {
-    setTeachers((prevTeachers) =>
-      prevTeachers.filter((t) => t.id !== teacherToDelete.id)
-    );
+    deleteTeacher(teacherToDelete.id);
   };
 
   const handleViewDetails = (teacher: Teacher) => {
@@ -88,7 +37,7 @@ export default function TeacherManagementPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button onClick={() => setIsAddTeacherModalOpen(true)}>
+          <Button onClick={() => router.push('/teachers/add')}>
             <PlusCircle className="mr-2 h-4 w-4" />
             Add New Teacher
           </Button>
@@ -104,7 +53,7 @@ export default function TeacherManagementPage() {
               <TeacherCard
                 key={teacher.id}
                 teacher={teacher}
-                onPay={handleOpenPaymentModal}
+                onPay={() => {}} // No longer needed as we use dynamic routes
                 onEdit={handleEditTeacher}
                 onDelete={handleDeleteTeacher}
                 onViewDetails={() => handleViewDetails(teacher)}
@@ -115,7 +64,7 @@ export default function TeacherManagementPage() {
         <div className="hidden md:block">
           <TeacherTable
             teachers={teachers}
-            onPay={handleOpenPaymentModal}
+            onPay={() => {}} // No longer needed as we use dynamic routes
             onEdit={handleEditTeacher}
             onDelete={handleDeleteTeacher}
             onViewDetails={handleViewDetails}
@@ -123,23 +72,7 @@ export default function TeacherManagementPage() {
         </div>
       </main>
 
-      <PaymentModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onSuccess={handlePaymentSuccess}
-        teacher={selectedTeacher}
-      />
-      <AddTeacherModal
-        isOpen={isAddTeacherModalOpen}
-        onClose={() => setIsAddTeacherModalOpen(false)}
-        onAddTeacher={handleAddTeacher}
-      />
-      <EditTeacherModal
-        isOpen={isEditTeacherModalOpen}
-        onClose={() => setIsEditTeacherModalOpen(false)}
-        teacher={selectedTeacher}
-        onSave={handleSaveTeacher}
-      />
+
     </div>
   );
 }

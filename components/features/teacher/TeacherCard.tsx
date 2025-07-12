@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { MoreVertical, DollarSign, Edit, Trash2 } from "lucide-react";
+import Link from "next/link";
 
 export interface TeacherCardProps {
   teacher: Teacher;
@@ -61,22 +62,30 @@ export const TeacherCard = ({
           <CardTitle className="text-lg font-medium">{teacher.name}</CardTitle>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onPay(teacher)}>
-                <DollarSign className="mr-2 h-4 w-4" />
-                Make Payment
+              <DropdownMenuItem asChild>
+                <Link href={`/teachers/${teacher.id}/payment`} onClick={(e) => e.stopPropagation()}>
+                  <DollarSign className="mr-2 h-4 w-4" />
+                  Make Payment
+                </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onEdit(teacher)}>
-                <Edit className="mr-2 h-4 w-4" />
-                Edit
+              <DropdownMenuItem asChild>
+                <Link href={`/teachers/${teacher.id}/edit`} onClick={(e) => e.stopPropagation()}>
+                  <Edit className="mr-2 h-4 w-4" />
+                  Edit
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-red-500"
-                onClick={handleDeleteClick}>
+                onClick={(e) => { e.stopPropagation(); handleDeleteClick(); }}>
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete
               </DropdownMenuItem>
