@@ -59,7 +59,7 @@ export const TeacherTable = ({
           {teachers.map((teacher) => (
             <TableRow
               key={teacher.id}
-              className={onViewDetails ? "cursor-pointer hover:bg-gray-100 transition" : undefined}
+              className={onViewDetails ? "cursor-pointer transition" : undefined}
               onClick={onViewDetails ? () => onViewDetails(teacher) : undefined}
               role={onViewDetails ? "button" : undefined}
               tabIndex={onViewDetails ? 0 : undefined}
