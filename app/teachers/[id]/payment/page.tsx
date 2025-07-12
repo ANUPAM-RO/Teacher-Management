@@ -15,6 +15,14 @@ import {
   FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog";
 import { 
   Loader2, 
   CreditCard, 
@@ -74,6 +82,8 @@ export default function PaymentPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [isFormValid, setIsFormValid] = useState(false);
+  const [showPaymentConfirmation, setShowPaymentConfirmation] = useState(false);
+  const [pendingPaymentData, setPendingPaymentData] = useState<PaymentFormValues | null>(null);
 
 
 
@@ -272,16 +282,19 @@ export default function PaymentPage() {
       return;
     }
 
-    // Confirm payment with user
-    const confirmed = window.confirm(
-      `Are you sure you want to process a payment of $${data.amount.toLocaleString()} to ${teacher.name}?`
-    );
+    // Show payment confirmation dialog
+    setPendingPaymentData(data);
+    setShowPaymentConfirmation(true);
+  }, [teacher, validateForm]);
 
-    if (!confirmed) {
+  const handlePaymentConfirm = useCallback(async () => {
+    if (!teacher || !pendingPaymentData) {
+      toast.error("No teacher or payment data available");
       return;
     }
 
     setIsSubmitting(true);
+    setShowPaymentConfirmation(false);
 
     try {
       // Simulate API call
@@ -291,7 +304,7 @@ export default function PaymentPage() {
       updateTeacherPaymentStatus(teacher.id, "Paid", new Date().toISOString());
       
       toast.success("Payment Successful!", {
-        description: `$${data.amount.toLocaleString()} has been sent to ${teacher.name}.`
+        description: `$${pendingPaymentData.amount.toLocaleString()} has been sent to ${teacher.name}.`
       });
       
       router.push("/teachers");
@@ -300,8 +313,14 @@ export default function PaymentPage() {
       console.error('Payment error:', error);
     } finally {
       setIsSubmitting(false);
+      setPendingPaymentData(null);
     }
-  }, [teacher, router, validateForm]);
+  }, [teacher, pendingPaymentData, router, updateTeacherPaymentStatus]);
+
+  const handlePaymentCancel = useCallback(() => {
+    setShowPaymentConfirmation(false);
+    setPendingPaymentData(null);
+  }, []);
 
   // Don't render if no teacher
   if (!teacher) {
@@ -851,6 +870,116 @@ export default function PaymentPage() {
           </div>
         </div>
       </div>
+
+      {/* Payment Confirmation Dialog */}
+      <Dialog open={showPaymentConfirmation} onOpenChange={setShowPaymentConfirmation}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Shield className="w-5 h-5 text-primary" />
+              Confirm Payment
+            </DialogTitle>
+            <DialogDescription className="text-left">
+              Please review the payment details before proceeding.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {pendingPaymentData && teacher && (
+            <div className="space-y-4">
+              {/* Teacher Info */}
+              <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
+                <Avatar className="w-12 h-12">
+                  <AvatarImage src={teacher.avatarUrl} alt={teacher.name} />
+                  <AvatarFallback className="text-sm font-bold">
+                    {teacher.name.substring(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-semibold text-sm">{teacher.name}</p>
+                  <p className="text-xs text-muted-foreground">{teacher.subject}</p>
+                </div>
+              </div>
+
+              {/* Payment Details */}
+              <div className="space-y-3">
+                <div className="flex justify-between items-center p-3 bg-primary/5 rounded-lg border border-primary/20">
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="w-4 h-4 text-primary" />
+                    <span className="font-medium text-sm">Amount</span>
+                  </div>
+                  <span className="font-bold text-lg text-primary">
+                    ${pendingPaymentData.amount.toLocaleString()}
+                  </span>
+                </div>
+
+                {pendingPaymentData.note && (
+                  <div className="flex justify-between items-start p-3 bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <Banknote className="w-4 h-4 text-muted-foreground" />
+                      <span className="font-medium text-sm">Note</span>
+                    </div>
+                    <span className="text-sm text-muted-foreground text-right max-w-[200px]">
+                      {pendingPaymentData.note}
+                    </span>
+                  </div>
+                )}
+
+                <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    {paymentMethod === 'bank' ? (
+                      <Building2 className="w-4 h-4 text-muted-foreground" />
+                    ) : (
+                      <CreditCard className="w-4 h-4 text-muted-foreground" />
+                    )}
+                    <span className="font-medium text-sm">Payment Method</span>
+                  </div>
+                  <span className="text-sm font-medium">
+                    {paymentMethod === 'bank' ? 'Bank Transfer' : 'UPI Payment'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Warning */}
+              <div className="p-3 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                  <p className="text-xs text-yellow-800 dark:text-yellow-200">
+                    This action cannot be undone. Please ensure all details are correct before confirming.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter className="flex flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={handlePaymentCancel}
+              disabled={isSubmitting}
+              className="w-full sm:w-auto"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handlePaymentConfirm}
+              disabled={isSubmitting}
+              className="w-full sm:w-auto bg-primary hover:bg-primary/90"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  Confirm Payment
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 } 
