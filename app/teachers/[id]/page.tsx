@@ -8,7 +8,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { ArrowLeft, Copy, Check, CreditCard, Smartphone, Edit } from "lucide-react";
+import { ArrowLeft, Copy, Check, CreditCard, Smartphone, Edit, Shield, User, Calendar, GraduationCap, Phone, MapPin } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useTeachers } from "@/lib/contexts/TeacherContext";
@@ -87,22 +87,155 @@ export default function TeacherDetailsPage() {
               Edit Details
             </Link>
           </Button>
+          
+          {/* Personal Information */}
           <div className="mt-4 w-full">
-            <h3 className="font-semibold mb-2">Personal Info</h3>
-            <ul className="space-y-1">
-              <li><span className="font-medium">Phone:</span> {teacher.phone || "-"}</li>
-              <li><span className="font-medium">DOB:</span> {teacher.dob || "-"}</li>
-              <li><span className="font-medium">Gender:</span> {teacher.gender || "-"}</li>
-            </ul>
+            <h3 className="font-semibold mb-3 flex items-center gap-2">
+              <User className="w-4 h-4" />
+              Personal Information
+            </h3>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Phone className="w-4 h-4 text-muted-foreground" />
+                <div>
+                  <span className="text-sm font-medium">Phone:</span>
+                  <p className="text-sm text-muted-foreground">{teacher.phone || "Not provided"}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-muted-foreground" />
+                <div>
+                  <span className="text-sm font-medium">Date of Birth:</span>
+                  <p className="text-sm text-muted-foreground">
+                    {teacher.dob ? new Date(teacher.dob).toLocaleDateString() : "Not provided"}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <User className="w-4 h-4 text-muted-foreground" />
+                <div>
+                  <span className="text-sm font-medium">Gender:</span>
+                  <p className="text-sm text-muted-foreground">{teacher.gender || "Not provided"}</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <MapPin className="w-4 h-4 text-muted-foreground mt-0.5" />
+                <div>
+                  <span className="text-sm font-medium">Address:</span>
+                  <p className="text-sm text-muted-foreground">{teacher.address || "Not provided"}</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="mt-4 w-full">
-            <h3 className="font-semibold mb-2">Address</h3>
-            <div>{teacher.address || "-"}</div>
+
+          {/* Professional Information */}
+          <div className="mt-6 w-full">
+            <h3 className="font-semibold mb-3 flex items-center gap-2">
+              <Shield className="w-4 h-4" />
+              Professional Information
+            </h3>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-muted-foreground" />
+                <div>
+                  <span className="text-sm font-medium">Joining Date:</span>
+                  <p className="text-sm text-muted-foreground">
+                    {teacher.joiningDate ? new Date(teacher.joiningDate).toLocaleDateString() : "Not provided"}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <GraduationCap className="w-4 h-4 text-muted-foreground" />
+                <div>
+                  <span className="text-sm font-medium">Experience:</span>
+                  <p className="text-sm text-muted-foreground">
+                    {teacher.experience ? `${teacher.experience} years` : "Not provided"}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <GraduationCap className="w-4 h-4 text-muted-foreground mt-0.5" />
+                <div>
+                  <span className="text-sm font-medium">Qualification:</span>
+                  <p className="text-sm text-muted-foreground">{teacher.qualification || "Not provided"}</p>
+                </div>
+              </div>
+            </div>
           </div>
+
+          {/* Emergency Contact */}
+          {teacher.emergencyContact && (
+            <div className="mt-6 w-full">
+              <h3 className="font-semibold mb-3 flex items-center gap-2">
+                <Phone className="w-4 h-4" />
+                Emergency Contact
+              </h3>
+              <div className="space-y-3">
+                <div>
+                  <span className="text-sm font-medium">Name:</span>
+                  <p className="text-sm text-muted-foreground">{teacher.emergencyContact.name}</p>
+                </div>
+                <div>
+                  <span className="text-sm font-medium">Phone:</span>
+                  <p className="text-sm text-muted-foreground">{teacher.emergencyContact.phone}</p>
+                </div>
+                <div>
+                  <span className="text-sm font-medium">Relationship:</span>
+                  <p className="text-sm text-muted-foreground">{teacher.emergencyContact.relationship}</p>
+                </div>
+              </div>
+            </div>
+          )}
         </Card>
 
         {/* Right: Details Sections */}
         <div className="flex-1 flex flex-col gap-6">
+          {/* Payment Status Section */}
+          <Card className="p-6">
+            <h3 className="font-semibold mb-4 flex items-center gap-2">
+              <CreditCard className="w-5 h-5" />
+              Payment Information
+            </h3>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">Salary:</span>
+                  <span className="text-lg font-bold text-primary">
+                    ${teacher.salary?.toLocaleString() || "Not set"}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">Payment Status:</span>
+                  <Badge 
+                    variant={
+                      teacher.paymentStatus === "Paid" ? "default" :
+                      teacher.paymentStatus === "Pending" ? "secondary" : "destructive"
+                    }
+                  >
+                    {teacher.paymentStatus}
+                  </Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">Last Payment:</span>
+                  <span className="text-sm text-muted-foreground">
+                    {teacher.lastPaymentDate ? 
+                      new Date(teacher.lastPaymentDate).toLocaleDateString() : 
+                      "No payments yet"
+                    }
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center justify-center">
+                <Button asChild className="w-full">
+                  <Link href={`/teachers/${teacher.id}/payment`}>
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Make Payment
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </Card>
+
           {/* Bank Details Section */}
           <Card className="p-6">
             <h3 className="font-semibold mb-4 flex items-center gap-2">
